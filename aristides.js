@@ -54,6 +54,7 @@ function Aristides(){
         app.use(bodyParser.urlencoded({ extended: false }));
         app.use(bodyParser.json());
         app.listen(that.config.expressPort);
+        expressListeners(app);
     }
 
     /**
@@ -66,6 +67,28 @@ function Aristides(){
             next();
         });
         io.listen(that.config.socketPort);
+
+        io.on('connection',function(socket){
+            socketListeners(io,socket);
+        });
+    }
+
+    /**
+     * Express listener default
+     * @param express
+     * @param app
+     */
+    function expressListeners(app){
+        //Add here all default listener for socket
+    }
+
+    /**
+     * Socket listener default
+     * @param io
+     * @param socket
+     */
+    function socketListeners(io,socket){
+       //Add here all default listener for socket
     }
 
     /**
