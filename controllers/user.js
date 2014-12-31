@@ -8,6 +8,16 @@ var userModel = require('../models/user.js');
 function userCtrl(app){
 
     app.get('/user/:userId',getUser);
+    app.post('/login',login);
+    app.post('/register',register);
+
+    function login(req,res){
+
+    }
+
+    function register(req,res){
+
+    }
 
     function getUser(req,res){
         var response = {
