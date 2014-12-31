@@ -69,22 +69,12 @@ function Aristides(){
     }
 
     /**
-     * Socket listener default
-     * @param io
-     * @param socket
-     */
-    function socketListeners(io,socket){
-       //Add here all default listener for socket
-    }
-
-    /**
      * Initialize server for Aristides
      * @method initialize
      */
     this.initialize = function(){
         var connectCallback = function(){
-            initExpress();
-            initSocket();
+            listener();
         };
         connectDatabase(connectCallback);
     };
