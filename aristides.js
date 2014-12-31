@@ -1,7 +1,7 @@
 /**
  * Created by Claudio Marrero
  */
-
+'use strict';
 function Aristides(){
 
     /**
@@ -49,37 +49,23 @@ function Aristides(){
      * Initialization of Express
      * @method initExpress
      */
-    function initExpress(){
+    function listener(){
         var app = express();
         app.use(bodyParser.urlencoded({ extended: false }));
         app.use(bodyParser.json());
         app.listen(that.config.expressPort);
-        expressListeners(app);
-    }
 
-    /**
-     * Initialization of Socket
-     * @method initSocket
-     */
-    function initSocket(){
+        var userCtrl = require('./controllers/user.js')(app);
+
         var io = require('socket.io')();
         io.use(function(socket, next) {
             next();
         });
         io.listen(that.config.socketPort);
-
         io.on('connection',function(socket){
-            socketListeners(io,socket);
+            //User Listeners
         });
-    }
 
-    /**
-     * Express listener default
-     * @param express
-     * @param app
-     */
-    function expressListeners(app){
-        //Add here all default listener for socket
     }
 
     /**
@@ -101,7 +87,8 @@ function Aristides(){
             initSocket();
         };
         connectDatabase(connectCallback);
-    }
+    };
+
 }
 
 var aristides = new Aristides();
