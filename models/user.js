@@ -14,10 +14,9 @@ function userModel(){
 
     var schema = new mongoose.Schema({
         email:{ type: String, required: true, unique:true, validate: [validate.email, 'invalid email address'] },
-        password:{type: String, required:true},
-        credentials:{type: String, required: true, unique: true}
+        fingerprint:{type: String, required: true, unique: true}
     });
-    schema.index({email: 1, credentials: 1});
+    schema.index({email: 1, fingerprint: 1});
 
     return mongoose.model('user', schema, 'user');
 }
