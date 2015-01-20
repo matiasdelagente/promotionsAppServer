@@ -1,13 +1,39 @@
 {
-  "name": "Aristides",
-  "version": "0.0.1",
-  "dependencies": {
-    "body-parser": "^1.10.0",
-    "bson": "^0.2.16",
-    "express": "^4.10.6",
-    "mongoose": "^3.8.21",
-    "mongoose-validate": "0.0.5",
-    "socket.io": "^1.2.1"
-  },
-  "devDependencies": {}
+    "name": "YaServer",
+    "private": true,
+    "version": "0.0.1",
+    "description": "Ya App Server",
+    "dependencies":{
+        "express": "latest",
+        "cookie-parser": "latest",
+        "body-parser": "latest",
+        "cookie-session": "latest",
+        "express-session": "latest",
+        "express-simple-cdn": "latest",
+        "method-override": "latest",
+        "mailer": "latest",
+        "mongoose": "latest",
+        "mongoose-validate": "latest",
+        "connect": "latest",
+        "consolidate": "latest",
+        "cookie":"latest",
+        "hogan.js": "latest",
+        "socket.io":"latest"
+    },
+    "devDependencies": {
+        "bower": "latest",
+        "grunt": "latest",
+        "grunt-contrib-clean": "latest",
+        "grunt-contrib-concat": "latest",
+        "grunt-contrib-copy": "latest",
+        "grunt-contrib-cssmin": "latest",
+        "grunt-contrib-htmlmin": "latest",
+        "grunt-contrib-jshint": "latest",
+        "grunt-contrib-uglify": "latest",
+        "grunt-filerev": "latest",
+        "grunt-replace": "latest",
+        "grunt-usemin": "latest",
+        "load-grunt-tasks": "latest",
+        "grunt-exec":"latest"
+    }
 }

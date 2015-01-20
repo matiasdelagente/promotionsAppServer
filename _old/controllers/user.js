@@ -15,6 +15,12 @@ function userCtrl(app){
 
     this.users = [];
 
+    this.on = function(socket){
+        socket.on('user:login',function(data,fn){
+
+        });
+    };
+
     function login(req,res){
 
         var response = {
