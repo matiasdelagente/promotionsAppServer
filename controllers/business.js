@@ -21,7 +21,10 @@ module.exports = function(params){
          * @method init
          */
         function init(){
-            //TODO: Add endpoints of express
+            params.app('/business/:zone/:skip/:limit',get);
+            params.app('/business/:zone/:skip/:limit/:category',get);
+            params.app('/business/:zone/:skip/:limit/:category/:name',get);
+            params.app('/business/:businessId',getById);
         }
 
 
@@ -41,6 +44,21 @@ module.exports = function(params){
 
             var query = {};
 
+            if(req.params.zone){
+                query.zone = req.params.zone;
+            }
+
+            if(req.params.category){
+                query.category = req.params.category;
+            }
+
+            if(req.params.name){
+                query.name = {'$regex': req.params.name};
+            }
+
+            var skip = (req.params.skip)?req.params.skip:0;
+            var limit = (req.params.limit)?req.params.limit:20;
+
             var businessCb = function(err,businessDoc){
                 if(err){
                     if(params.debug)console.log('Error mongodb geting categories', err);
@@ -48,34 +66,29 @@ module.exports = function(params){
                     res.json(response);
                     return;
                 }
-
                 response.code = 200;
                 response.result = businessDoc;
                 res.json(response);
             };
 
-            params.Ya.business_model.find(query).skip(0).limit(20).exec(businessCb);
+            params.Ya.business_model.find(query).populate('category zone').skip(skip).limit(limit).exec(businessCb);
         }
 
         /**
-         * Get one single doctor
+         * Get one business from db by id
          *
-         * @method doctor
+         * @method getById
          * @param req {Object} request from client
          * @param res {Object} response closure
          */
-        function business(req,res){
+        function getById(req,res){
 
             var response = {
                 code:500,
-                result:{
-                    err:"You miss some data"
-                }
+                result:{}
             };
 
-            //TODO: Validate request
-            var businessId = req.params.id;
-
+            var businessId = req.params.businessId;
             if(!businessId){
                 res.json(response);
                 return;
@@ -85,15 +98,6 @@ module.exports = function(params){
                 if(err){
                     if(params.debug)console.log('Error mongodb geting categories', err);
                     response.code = 506;
-                    response.result.err = err;
-                    res.json(response);
-                    return;
-                }
-
-                if(!businessDoc){
-                    if(params.debug)console.log('Dont fine any categories with this ID:', businessDoc);
-                    response.code = 200;
-                    response.result = businessDoc;
                     res.json(response);
                     return;
                 }
@@ -103,7 +107,7 @@ module.exports = function(params){
                 res.json(response);
             };
 
-            params.Ya.business_model.findById(businessId).exec(businessCb);
+            params.Ya.business_model.findById(businessId).populate('category zone').exec(businessCb);
         }
 
         return {
