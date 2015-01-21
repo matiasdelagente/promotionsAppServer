@@ -21,9 +21,9 @@ module.exports = function(params){
          * @method init
          */
         function init(){
-            params.Ya.app.get('/category',get);
-            params.Ya.app.get('/category/:categoryId',getById);
-            params.Ya.app.post('/category',add);
+            params.app.get('/category',get);
+            params.app.get('/category/:categoryId',getById);
+            params.app.post('/category',add);
         }
 
 

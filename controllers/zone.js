@@ -21,9 +21,9 @@ module.exports = function(params){
          * @method init
          */
         function init(){
-            params.Ya.app.get('/zone',get);
-            params.Ya.app.get('/zone/:zoneId',getById);
-            params.Ya.app.post('/zone',add);
+            params.app.get('/zone',get);
+            params.app.get('/zone/:zoneId',getById);
+            params.app.post('/zone',add);
         }
 
 

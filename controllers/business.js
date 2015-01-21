@@ -21,11 +21,12 @@ module.exports = function(params){
          * @method init
          */
         function init(){
-            params.Ya.app.get('/business/:zone/:skip/:limit',get);
-            params.Ya.app.get('/business/:zone/:skip/:limit/:category',get);
-            params.Ya.app.get('/business/:zone/:skip/:limit/:category/:name',get);
-            params.Ya.app.get('/business/:businessId',getById);
-            params.Ya.app.post('/business',add);
+            params.app.get('/business/:zone',get);
+            params.app.get('/business/:zone/:skip/:limit',get);
+            params.app.get('/business/:zone/:skip/:limit/:category',get);
+            params.app.get('/business/:zone/:skip/:limit/:category/:name',get);
+            params.app.get('/business/:businessId',getById);
+            params.app.post('/business',add);
         }
 
 
@@ -62,7 +63,7 @@ module.exports = function(params){
 
             var businessCb = function(err,businessDoc){
                 if(err){
-                    if(params.debug)console.log('Error mongodb geting categories', err);
+                    if(params.debug)console.log('Error mongodb get business', err);
                     response.code = 506;
                     res.json(response);
                     return;
