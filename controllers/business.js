@@ -21,10 +21,10 @@ module.exports = function(params){
          * @method init
          */
         function init(){
-            params.app.get('/business/:zone',get);
-            params.app.get('/business/:zone/:skip/:limit',get);
-            params.app.get('/business/:zone/:skip/:limit/:category',get);
-            params.app.get('/business/:zone/:skip/:limit/:category/:name',get);
+            params.app.get('/businesses/:zone',get);
+            params.app.get('/businesses/:zone/:skip/:limit',get);
+            params.app.get('/businesses/:zone/:skip/:limit/:category',get);
+            params.app.get('/businesses/:zone/:skip/:limit/:category/:name',get);
             params.app.get('/business/:businessId',getById);
             params.app.post('/business',add);
         }
