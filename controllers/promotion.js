@@ -23,7 +23,8 @@ module.exports = function(params){
         function init(){
             params.app.get('/promotions/:zone',get);
             params.app.get('/promotions/:zone/:skip/:limit',get);
-            params.app.get('/promotions/:zone/:skip/:limit/:businessId',get);
+            params.app.get('/business/promotions/:businessId',get);
+            params.app.get('/business/promotions/:businessId/:skip/:limit',get);
             params.app.get('/promotion/:promotionId',getById);
             params.app.post('/promotion',add);
         }
