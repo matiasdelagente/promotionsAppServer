@@ -4,7 +4,7 @@
  * @module _Ya
  * @submodule doctor
  * @author Claudio A. Marrero
- * @class _Ya.Business
+ * @class _Ya.Category
  */
 'use strict';
 module.exports = function(params){
@@ -13,7 +13,7 @@ module.exports = function(params){
         return;
     }
 
-    var Business = (function(){
+    var Category = (function(){
 
         /**
          * Initialization method for Admin
@@ -21,16 +21,14 @@ module.exports = function(params){
          * @method init
          */
         function init(){
-            params.Ya.app.get('/business/:zone/:skip/:limit',get);
-            params.Ya.app.get('/business/:zone/:skip/:limit/:category',get);
-            params.Ya.app.get('/business/:zone/:skip/:limit/:category/:name',get);
-            params.Ya.app.get('/business/:businessId',getById);
-            params.Ya.app.post('/business',add);
+            params.Ya.app.get('/category',get);
+            params.Ya.app.get('/category/:categoryId',getById);
+            params.Ya.app.post('/category',add);
         }
 
 
         /**
-         * Get all business from db
+         * Get all category from db
          *
          * @method get
          * @param req {Object} request from client
@@ -45,38 +43,23 @@ module.exports = function(params){
 
             var query = {};
 
-            if(req.params.zone){
-                query.zone = req.params.zone;
-            }
-
-            if(req.params.category){
-                query.category = req.params.category;
-            }
-
-            if(req.params.name){
-                query.name = {'$regex': req.params.name};
-            }
-
-            var skip = (req.params.skip)?req.params.skip:0;
-            var limit = (req.params.limit)?req.params.limit:20;
-
-            var businessCb = function(err,businessDoc){
+            var categoryCb = function(err,categoryDoc){
                 if(err){
-                    if(params.debug)console.log('Error mongodb geting categories', err);
+                    if(params.debug)console.log('Error mongodb Categorys', err);
                     response.code = 506;
                     res.json(response);
                     return;
                 }
                 response.code = 200;
-                response.result = businessDoc;
+                response.result = categoryDoc;
                 res.json(response);
             };
 
-            params.Ya.business_model.find(query).populate('category zone').skip(skip).limit(limit).exec(businessCb);
+            params.Ya.category_model.find(query).exec(categoryCb);
         }
 
         /**
-         * Get one business from db by id
+         * Get one category from db by id
          *
          * @method getById
          * @param req {Object} request from client
@@ -89,30 +72,29 @@ module.exports = function(params){
                 result:{}
             };
 
-            var businessId = req.params.businessId;
-            if(!businessId){
+            var categoryId = req.params.categoryId;
+            if(!categoryId){
                 res.json(response);
                 return;
             }
 
-            var businessCb = function(err,businessDoc){
+            var categoryCb = function(err,categoryDoc){
                 if(err){
                     if(params.debug)console.log('Error mongodb geting categories', err);
                     response.code = 506;
                     res.json(response);
                     return;
                 }
-
                 response.code = 200;
-                response.result = businessDoc;
+                response.result = categoryDoc;
                 res.json(response);
             };
 
-            params.Ya.business_model.findById(businessId).populate('category zone').exec(businessCb);
+            params.Ya.category_model.findById(categoryId).exec(categoryCb);
         }
 
         /**
-         * Create new business
+         * Create new category
          * @method add
          * @param req
          * @param res
@@ -124,27 +106,14 @@ module.exports = function(params){
                 result:{}
             };
 
-            //TODO: Upload image
-
-            var business =
-            {
+            var category ={
                 "name": req.body.name,
-                "address": req.body.address,
-                "dispo":req.body.dispo,
-                "bgimg":req.body.bgimg,
-                "contact":{
-                    "address":req.body.address,
-                    "phone":req.body.phone,
-                    "facebook":req.body.facebook,
-                    "web":req.body.web
-                },
-                "zone":req.body.zone,
-                "category":req.body.category
+                "description": req.body.description
             };
 
-            params.Ya.business_model.create(business,function(err,doc){
+            params.Ya.category_model.create(category,function(err,doc){
                 if(err){
-                    if(params.debug)console.log('Error mongodb adding business', err);
+                    if(params.debug)console.log('Error mongodb adding category', err);
                     response.code = 506;
                     res.json(response);
                     return;
@@ -160,8 +129,8 @@ module.exports = function(params){
         };
     })();
 
-    Business.init();
+    Category.init();
 
-    return Business;
+    return Category;
 
 };

@@ -4,7 +4,7 @@
  * @module _Ya
  * @submodule doctor
  * @author Claudio A. Marrero
- * @class _Ya.Business
+ * @class _Ya.Zone
  */
 'use strict';
 module.exports = function(params){
@@ -13,7 +13,7 @@ module.exports = function(params){
         return;
     }
 
-    var Business = (function(){
+    var Zone = (function(){
 
         /**
          * Initialization method for Admin
@@ -21,16 +21,14 @@ module.exports = function(params){
          * @method init
          */
         function init(){
-            params.Ya.app.get('/business/:zone/:skip/:limit',get);
-            params.Ya.app.get('/business/:zone/:skip/:limit/:category',get);
-            params.Ya.app.get('/business/:zone/:skip/:limit/:category/:name',get);
-            params.Ya.app.get('/business/:businessId',getById);
-            params.Ya.app.post('/business',add);
+            params.Ya.app.get('/zone',get);
+            params.Ya.app.get('/zone/:zoneId',getById);
+            params.Ya.app.post('/zone',add);
         }
 
 
         /**
-         * Get all business from db
+         * Get all zone from db
          *
          * @method get
          * @param req {Object} request from client
@@ -45,38 +43,23 @@ module.exports = function(params){
 
             var query = {};
 
-            if(req.params.zone){
-                query.zone = req.params.zone;
-            }
-
-            if(req.params.category){
-                query.category = req.params.category;
-            }
-
-            if(req.params.name){
-                query.name = {'$regex': req.params.name};
-            }
-
-            var skip = (req.params.skip)?req.params.skip:0;
-            var limit = (req.params.limit)?req.params.limit:20;
-
-            var businessCb = function(err,businessDoc){
+            var zoneCb = function(err,zoneDoc){
                 if(err){
-                    if(params.debug)console.log('Error mongodb geting categories', err);
+                    if(params.debug)console.log('Error mongodb Zones', err);
                     response.code = 506;
                     res.json(response);
                     return;
                 }
                 response.code = 200;
-                response.result = businessDoc;
+                response.result = zoneDoc;
                 res.json(response);
             };
 
-            params.Ya.business_model.find(query).populate('category zone').skip(skip).limit(limit).exec(businessCb);
+            params.Ya.zone_model.find(query).exec(zoneCb);
         }
 
         /**
-         * Get one business from db by id
+         * Get one zone from db by id
          *
          * @method getById
          * @param req {Object} request from client
@@ -89,30 +72,29 @@ module.exports = function(params){
                 result:{}
             };
 
-            var businessId = req.params.businessId;
-            if(!businessId){
+            var zoneId = req.params.zoneId;
+            if(!zoneId){
                 res.json(response);
                 return;
             }
 
-            var businessCb = function(err,businessDoc){
+            var zoneCb = function(err,zoneDoc){
                 if(err){
                     if(params.debug)console.log('Error mongodb geting categories', err);
                     response.code = 506;
                     res.json(response);
                     return;
                 }
-
                 response.code = 200;
-                response.result = businessDoc;
+                response.result = zoneDoc;
                 res.json(response);
             };
 
-            params.Ya.business_model.findById(businessId).populate('category zone').exec(businessCb);
+            params.Ya.zone_model.findById(zoneId).exec(zoneCb);
         }
 
         /**
-         * Create new business
+         * Create new zone
          * @method add
          * @param req
          * @param res
@@ -124,27 +106,14 @@ module.exports = function(params){
                 result:{}
             };
 
-            //TODO: Upload image
-
-            var business =
-            {
+            var zone ={
                 "name": req.body.name,
-                "address": req.body.address,
-                "dispo":req.body.dispo,
-                "bgimg":req.body.bgimg,
-                "contact":{
-                    "address":req.body.address,
-                    "phone":req.body.phone,
-                    "facebook":req.body.facebook,
-                    "web":req.body.web
-                },
-                "zone":req.body.zone,
-                "category":req.body.category
+                "description": req.body.description
             };
 
-            params.Ya.business_model.create(business,function(err,doc){
+            params.Ya.zone_model.create(zone,function(err,doc){
                 if(err){
-                    if(params.debug)console.log('Error mongodb adding business', err);
+                    if(params.debug)console.log('Error mongodb adding zone', err);
                     response.code = 506;
                     res.json(response);
                     return;
@@ -160,8 +129,8 @@ module.exports = function(params){
         };
     })();
 
-    Business.init();
+    Zone.init();
 
-    return Business;
+    return Zone;
 
 };
