@@ -22,13 +22,10 @@ module.exports = function(params){
          */
         function init(){
             params.app.get('/promotions/:zone',get);
-            params.app.get('/promotions/:zone/:skip/:limit',get);
-            params.app.get('/business/promotions/:businessId',get);
-            params.app.get('/business/promotions/:businessId/:skip/:limit',get);
+            params.app.get('/promotions/:zone/:skip/:limit/:businessId',get);
             params.app.get('/promotion/:promotionId',getById);
             params.app.post('/promotion',add);
         }
-
 
         /**
          * Get all promotion from db
@@ -69,7 +66,7 @@ module.exports = function(params){
                 res.json(response);
             };
 
-            params.Ya.promotion_model.find(query).populate('business zone').skip(skip).limit(limit).exec(promotionCb);
+            params.Ya.promotion_model.find(query).populate('business category zone').skip(skip).limit(limit).exec(promotionCb);
         }
 
         /**
@@ -92,9 +89,12 @@ module.exports = function(params){
                 return;
             }
 
+            console.log(promotionId);
+
             var promotionCb = function(err,promotionDoc){
+                console.log(err,promotionDoc);
                 if(err){
-                    if(params.debug)console.log('Error mongodb geting categories', err);
+                    if(params.debug)console.log('Error mongodb get promotions', err);
                     response.code = 506;
                     res.json(response);
                     return;
@@ -104,7 +104,7 @@ module.exports = function(params){
                 res.json(response);
             };
 
-            params.Ya.promotion_model.findById(promotionId).populate('business zone').exec(promotionCb);
+            params.Ya.promotion_model.findById(promotionId).populate('business category zone').exec(promotionCb);
         }
 
         /**
@@ -121,7 +121,7 @@ module.exports = function(params){
             };
 
             //TODO: Upload image
-            var promotion =
+            var promotionObj =
             {
                 "name": req.body.name,
                 "description": req.body.description,
@@ -131,7 +131,7 @@ module.exports = function(params){
                 "zone": req.body.zone
             };
 
-            params.Ya.promotion_model.create(promotion,function(err,doc){
+            params.Ya.promotion_model.create(promotionObj,function(err,doc){
                 if(err){
                     if(params.debug)console.log('Error mongodb adding promotion', err);
                     response.code = 506;
