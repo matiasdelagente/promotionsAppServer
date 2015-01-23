@@ -25,7 +25,5 @@ module.exports = function(params){
         "date":{type: Date, default: new Date()}
     });
 
-    reserveSchema.index({name: 1});
-
     return params.mongoose.model('reserve', reserveSchema, 'reserve');
 };

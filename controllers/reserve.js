@@ -25,6 +25,7 @@ module.exports = function(params){
             params.app.get('/reserves/:device/:skip/:limit',get);
             params.app.get('/reserve/:reserveId',getById);
             params.app.post('/reserve',add);
+            params.app.post('/reserve/cancel',cancel);
         }
 
         /**
@@ -113,12 +114,18 @@ module.exports = function(params){
                 result:{}
             };
 
-            //TODO: Upload image
             var reserveObj =
             {
                 "device": req.body.device,
-                "promotion": req.body.promotionId,
+                "promotion": req.body.promotion,
                 "amount": req.body.amount
+            };
+
+            var promotion = function(){
+                params.Ya.promotion_model.findById(req.body.promotion).exec(function(err,promotionDoc){
+                    response.result.promotion = promotionDoc;
+                    res.json(response);
+                });
             };
 
             params.Ya.reserve_model.create(reserveObj,function(err,doc){
@@ -130,6 +137,45 @@ module.exports = function(params){
                 }
                 response.code = 200;
                 response.result = doc;
+                promotion();
+            });
+        }
+
+        /**
+         * Cancel reserve
+         * @method cancel
+         * @param req
+         * @param res
+         */
+        function cancel(req,res){
+
+            var response = {
+                code:500,
+                result:{}
+            };
+
+            var reserveId = req.params.reserveId;
+            var deviceId = req.params.deviceId;
+
+            if(!reserveId || !deviceId){
+                res.json(response);
+                return;
+            }
+
+            var query = {
+                _id:reserveId,
+                device:deviceId
+            };
+
+            params.Ya.reserve_model.remove(query).exec(function(err,reserveDoc){
+                if(err){
+                    if(params.debug)console.log('Error mongodb removing reserve', err);
+                    response.code = 506;
+                    res.json(response);
+                    return;
+                }
+                response.code = 200;
+                response.result = reserveDoc;
                 res.json(response);
             });
         }
