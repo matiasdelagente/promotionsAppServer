@@ -4,7 +4,7 @@
  * @module _Ya
  * @submodule doctor
  * @author Claudio A. Marrero
- * @class _Ya.Promotion
+ * @class _Ya.Reserve
  */
 'use strict';
 module.exports = function(params){
@@ -13,7 +13,7 @@ module.exports = function(params){
         return;
     }
 
-    var Promotion = (function(){
+    var Reserve = (function(){
 
         /**
          * Initialization method for Admin
@@ -21,14 +21,14 @@ module.exports = function(params){
          * @method init
          */
         function init(){
-            params.app.get('/promotions/:zone',get);
-            params.app.get('/promotions/:zone/:skip/:limit/:businessId',get);
-            params.app.get('/promotion/:promotionId',getById);
-            params.app.post('/promotion',add);
+            params.app.get('/reserves/:device',get);
+            params.app.get('/reserves/:device/:skip/:limit',get);
+            params.app.get('/reserve/:reserveId',getById);
+            params.app.post('/reserve',add);
         }
 
         /**
-         * Get all promotion from db
+         * Get all reserve from db
          *
          * @method get
          * @param req {Object} request from client
@@ -43,34 +43,30 @@ module.exports = function(params){
 
             var query = {};
 
-            if(req.params.zone){
-                query.zone = req.params.zone;
-            }
-
-            if(req.params.businessId){
-                query.business = req.params.businessId;
+            if(req.params.device){
+                query.device = req.params.device;
             }
 
             var skip = (req.params.skip)?req.params.skip:0;
             var limit = (req.params.limit)?req.params.limit:20;
 
-            var promotionCb = function(err,promotionDoc){
+            var reserveCb = function(err,reserveDoc){
                 if(err){
-                    if(params.debug)console.log('Error mongodb get promotion', err);
+                    if(params.debug)console.log('Error mongodb get reserve', err);
                     response.code = 506;
                     res.json(response);
                     return;
                 }
                 response.code = 200;
-                response.result = promotionDoc;
+                response.result = reserveDoc;
                 res.json(response);
             };
 
-            params.Ya.promotion_model.find(query).populate('business category zone').skip(skip).limit(limit).exec(promotionCb);
+            params.Ya.reserve_model.find(query).populate('device promotion').skip(skip).limit(limit).exec(reserveCb);
         }
 
         /**
-         * Get one promotion from db by id
+         * Get one reserve from db by id
          *
          * @method getById
          * @param req {Object} request from client
@@ -83,29 +79,29 @@ module.exports = function(params){
                 result:{}
             };
 
-            var promotionId = req.params.promotionId;
-            if(!promotionId){
+            var reserveId = req.params.reserveId;
+            if(!reserveId){
                 res.json(response);
                 return;
             }
 
-            var promotionCb = function(err,promotionDoc){
+            var reserveCb = function(err,reserveDoc){
                 if(err){
-                    if(params.debug)console.log('Error mongodb get promotions', err);
+                    if(params.debug)console.log('Error mongodb get reserves', err);
                     response.code = 506;
                     res.json(response);
                     return;
                 }
                 response.code = 200;
-                response.result = promotionDoc;
+                response.result = reserveDoc;
                 res.json(response);
             };
 
-            params.Ya.promotion_model.findById(promotionId).populate('business category zone').exec(promotionCb);
+            params.Ya.reserve_model.findById(reserveId).populate('device promotion').exec(reserveCb);
         }
 
         /**
-         * Create new promotion
+         * Create new reserve
          * @method add
          * @param req
          * @param res
@@ -118,19 +114,16 @@ module.exports = function(params){
             };
 
             //TODO: Upload image
-            var promotionObj =
+            var reserveObj =
             {
-                "name": req.body.name,
-                "description": req.body.description,
-                "bgimg": req.body.bgimg,
-                "business": req.body.business,
-                "category": req.body.category,
-                "zone": req.body.zone
+                "device": req.body.device,
+                "promotion": req.body.promotionId,
+                "amount": req.body.amount
             };
 
-            params.Ya.promotion_model.create(promotionObj,function(err,doc){
+            params.Ya.reserve_model.create(reserveObj,function(err,doc){
                 if(err){
-                    if(params.debug)console.log('Error mongodb adding promotion', err);
+                    if(params.debug)console.log('Error mongodb adding reserve', err);
                     response.code = 506;
                     res.json(response);
                     return;
@@ -146,8 +139,8 @@ module.exports = function(params){
         };
     })();
 
-    Promotion.init();
+    Reserve.init();
 
-    return Promotion;
+    return Reserve;
 
 };

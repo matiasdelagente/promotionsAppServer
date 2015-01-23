@@ -24,7 +24,11 @@ module.exports = function(params){
         "bgimg":{type: String},
         "business":{ type: params.mongoose.Schema.Types.ObjectId, ref:'business'},
         "category":{ type: params.mongoose.Schema.Types.ObjectId, ref:'category'},
-        "zone":{ type: params.mongoose.Schema.Types.ObjectId, ref:'zone'}
+        "zone":{ type: params.mongoose.Schema.Types.ObjectId, ref:'zone'},
+        "time": { type: Date},
+        "expire": { type: Date},
+        "amount": { type: Number},
+        "takenUsers": { type: Number}
     });
 
     promotionSchema.index({name: 1});
