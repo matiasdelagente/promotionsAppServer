@@ -6,9 +6,9 @@
  * @class _Ya.device_model
  */
 'use strict';
-module.exports = function(params){
+module.exports = function (params) {
 
-    if(!params.Ya){
+    if (!params.Ya) {
         return;
     }
 
@@ -19,11 +19,26 @@ module.exports = function(params){
      * @private
      */
     var deviceSchema = new params.mongoose.Schema({
-        "fingerprint": { type: String, unique: true},
+        "fingerprint": {type: String, unique: true},
         "device": {},
-        "email": {type: String, required: true, unique:true, validate: [params.validate.email, 'invalid email address']},
-        "registerDate":{type: Date, default: new Date()},
-        "lastAccess":{type: Date, default: new Date()}
+        "notifications": {
+            id: {
+                type: String,
+                unique: true
+            },
+            enabled: {
+                type: Boolean,
+                default: true
+            }
+        },
+        "email": {
+            type: String,
+            required: true,
+            unique: true,
+            validate: [params.validate.email, 'invalid email address']
+        },
+        "registerDate": {type: Date, default: new Date()},
+        "lastAccess": {type: Date, default: new Date()}
     });
 
     deviceSchema.index({fingerprint: 1, email: 1});

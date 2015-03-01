@@ -25,6 +25,9 @@ module.exports = function(params){
             params.app.get('/devices/:skip/:limit',get);
             params.app.get('/device/:deviceId',getById);
             params.app.post('/device',add);
+            params.app.put('/device/:deviceId/notifications/id', updateNotificationsId);
+            params.app.put('/device/:deviceId/notifications/enabled', enableDisableNotifications);
+            params.app.get('/device/:deviceId/notifications/enabled', areNotificationsEnabled);
         }
 
         /**
@@ -125,6 +128,120 @@ module.exports = function(params){
                 response.result = doc;
                 res.json(response);
             });
+        }
+
+        /**
+         * Update notification id for a device
+         * @method updateNotificationsId
+         * @param req
+         * @param res
+         */
+        function updateNotificationsId(req,res){
+
+            var response = {
+                code:500,
+                result:{}
+            };
+
+            var deviceId = req.params.deviceId;
+            if(!deviceId){
+                res.json(response);
+                return;
+            }
+
+            var notificationId = req.body.id;
+
+            var updateNotificationsIdCb = function(err,deviceDoc){
+                if(err){
+                    if(params.debug)console.log('Error mongodb update notifications id', err);
+                    response.code = 506;
+                    res.json(response);
+                    return;
+                }
+                response.code = 200;
+                response.result = deviceDoc;
+                res.json(response);
+            };
+
+            params.Ya.device_model.findByIdAndUpdate(deviceId, {
+                $set: {
+                    'notifications.id': notificationId
+                }
+            }).exec(updateNotificationsIdCb);
+        }
+
+        /**
+         * Returns whether notifications are enabled or not
+         * @method areNotificationsEnabled
+         * @param req
+         * @param res
+         */
+        function areNotificationsEnabled(req,res){
+
+            var response = {
+                code:500,
+                result:{}
+            };
+
+            var deviceId = req.params.deviceId;
+            if(!deviceId){
+                res.json(response);
+                return;
+            }
+
+            var cb = function(err,deviceDoc){
+                if(err){
+                    if(params.debug)console.log('Error mongodb are notifications enabled', err);
+                    response.code = 506;
+                    res.json(response);
+                    return;
+                }
+                response.code = 200;
+                response.result = deviceDoc.notifications.enabled;
+                res.json(response);
+            };
+
+            params.Ya.device_model.findById(deviceId).exec(cb);
+        }
+
+        /**
+         * Enable/disable notifications for a device
+         * @method updateNotificationsConfig
+         * @param req
+         * @param res
+         */
+        function enableDisableNotifications(req,res){
+
+            var response = {
+                code:500,
+                result:{}
+            };
+
+            var deviceId = req.params.deviceId;
+            if(!deviceId){
+                res.json(response);
+                return;
+            }
+
+            var enabled = req.body.enabled;
+
+            var updateConfigCb = function(err,deviceDoc){
+                if(err){
+                    if(params.debug)console.log('Error mongodb enable/disable notifications', err);
+                    response.code = 506;
+                    res.json(response);
+                    return;
+                }
+                response.code = 200;
+                response.result = deviceDoc;
+                res.json(response);
+            };
+
+            params.Ya.device_model.findByIdAndUpdate(deviceId, {
+                $set: {
+                    'notifications.enabled': enabled
+                }
+            }).exec(updateConfigCb);
         }
 
         return {
