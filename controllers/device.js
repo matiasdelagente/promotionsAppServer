@@ -13,6 +13,7 @@ module.exports = function(params){
         return;
     }
 
+    var gcm = require('node-gcm');
     var Device = (function(){
 
         /**
@@ -28,6 +29,7 @@ module.exports = function(params){
             params.app.put('/device/:deviceId/notifications/id', updateNotificationsId);
             params.app.put('/device/:deviceId/notifications/enabled', enableDisableNotifications);
             params.app.get('/device/:deviceId/notifications/enabled', areNotificationsEnabled);
+            params.app.post('/device/:deviceId/notifications', sendNotification);
         }
 
         /**
@@ -242,6 +244,67 @@ module.exports = function(params){
                     'notifications.enabled': enabled
                 }
             }).exec(updateConfigCb);
+        }
+
+        /**
+         * Send a notification to a device
+         *
+         * @method sendNotification
+         * @param req {Object} request from client
+         * @param res {Object} response closure
+         */
+        function sendNotification(req,res){
+
+            var response = {
+                code:500,
+                result:{}
+            };
+
+            var deviceId = req.params.deviceId;
+            if(!deviceId){
+                res.json(response);
+                return;
+            }
+            var notification = {
+                title: req.body.title,
+                message: req.body.message
+            };
+            var message = new gcm.Message({
+                collapseKey: 'demo',
+                delayWhileIdle: true,
+                timeToLive: 3000,
+                data: notification
+            });
+            var APIKey = params.Ya.gcm.APIKey;
+            var sender = new gcm.Sender(APIKey);
+
+            var deviceCb = function(err,deviceDoc){
+                if(err){
+                    if(params.debug)console.log('Error mongodb send notification', err);
+                    response.code = 506;
+                    res.json(response);
+                    return;
+                }
+                if (deviceDoc.notifications.enabled) {
+                    sender.sendNoRetry(message, deviceDoc.notifications.id, function (err, result) {
+                        if (err) {
+                            if(params.debug)console.log('Error mongodb send notification', err);
+                            response.code = 500;
+                            res.json(response);
+                            return;
+                        }
+                        response.code = 200;
+                        response.result = result;
+                        res.json(response);
+                    });
+                } else {
+                    response.code = 200;
+                    response.result = 'Notificaciones desactivadas para el dispositivo ' + deviceId;
+                    res.json(response);
+                }
+            };
+
+            params.Ya.device_model.findById(deviceId).exec(deviceCb);
         }
 
         return {
