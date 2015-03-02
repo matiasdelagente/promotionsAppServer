@@ -30,6 +30,7 @@ module.exports = function(params){
             params.app.put('/device/:deviceId/notifications/enabled', enableDisableNotifications);
             params.app.get('/device/:deviceId/notifications/enabled', areNotificationsEnabled);
             params.app.post('/device/:deviceId/notifications', sendNotification);
+            params.app.put('/device/:deviceId/email', updateEmail);
         }
 
         /**
@@ -305,6 +306,53 @@ module.exports = function(params){
             };
 
             params.Ya.device_model.findById(deviceId).exec(deviceCb);
+        }
+
+
+
+        /**
+         * Update device's email
+         * @method updateEmail
+         * @param req
+         * @param res
+         */
+        function updateEmail(req,res){
+
+            var response = {
+                code:500,
+                result:{}
+            };
+
+            var deviceId = req.params.deviceId;
+            if(!deviceId){
+                res.json(response);
+                return;
+            }
+
+            var email = req.body.email;
+
+            var updateEmailCb = function(err,deviceDoc){
+                if(err){
+                    if(params.debug)console.log('Error mongodb update email', err);
+                    response.code = 506;
+                    res.json(response);
+                    return;
+                }
+                deviceDoc.email = email;
+                deviceDoc.save(function (err, updatedDevice) {
+                    if(err){
+                        if(params.debug)console.log('Error mongodb update email', err);
+                        response.code = 506;
+                        res.json(response);
+                        return;
+                    }
+                    response.code = 200;
+                    response.result = updatedDevice;
+                    res.json(response);
+                });
+            };
+
+            params.Ya.device_model.findById(deviceId).exec(updateEmailCb);
         }
 
         return {
