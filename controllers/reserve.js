@@ -7,6 +7,9 @@
  * @class _Ya.Reserve
  */
 'use strict';
+
+var moment = require('moment');
+
 module.exports = function(params){
 
     if(!params.Ya){
@@ -29,7 +32,7 @@ module.exports = function(params){
         }
 
         /**
-         * Get all reserve from db
+         * Get active reserves from db
          *
          * @method get
          * @param req {Object} request from client
@@ -63,7 +66,11 @@ module.exports = function(params){
                 res.json(response);
             };
 
-            params.Ya.reserve_model.find(query).populate('device promotion').skip(skip).limit(limit).exec(reserveCb);
+            params.Ya.reserve_model.find(query).populate('device promotion')
+                .skip(skip)
+                .limit(limit)
+                .where('ends').gt(moment())
+                .exec(reserveCb);
         }
 
         /**
@@ -114,31 +121,46 @@ module.exports = function(params){
                 result:{}
             };
 
-            var reserveObj =
-            {
+            var reserveObj = {
                 "device": req.body.device,
                 "promotion": req.body.promotion,
+                "business": req.body.business,
                 "amount": req.body.amount
             };
 
-            var promotion = function(){
-                params.Ya.promotion_model.findById(req.body.promotion).exec(function(err,promotionDoc){
-                    response.result.promotion = promotionDoc;
+            if(!reserveObj.promotion) {
+                if (!reserveObj.business) {
                     res.json(response);
-                });
-            };
+                    return;
+                }
+            }
 
-            params.Ya.reserve_model.create(reserveObj,function(err,doc){
-                if(err){
-                    if(params.debug)console.log('Error mongodb adding reserve', err);
+            function createReserve (err,businessDoc) {
+                // TODO: Handle err
+                reserveObj.starts = moment();
+                reserveObj.ends = moment(reserveObj.starts).add(businessDoc.reserveExpireTime, 'minutes');
+                params.Ya.reserve_model.create(reserveObj, sendResponse);
+            }
+
+            function sendResponse (err, reserve) {
+                if (err) {
+                    if (params.debug)console.log('Error mongodb adding reserve', err);
                     response.code = 506;
                     res.json(response);
                     return;
                 }
                 response.code = 200;
-                response.result = doc;
-                promotion();
-            });
+                response.result = reserve;
+                res.json(response);
+            }
+            if (reserveObj.promotion) {
+                params.Ya.promotion_model.findById(reserveObj.promotion).exec(function(err,promotionDoc){
+                    // TODO: Handle err
+                    params.Ya.business_model.findById(promotionDoc.business).exec(createReserve);
+                });
+            } else if (reserveObj.business) {
+                params.Ya.promotion_model.findById(reserveObj.business).exec(createReserve);
+            }
         }
 
         /**

@@ -30,7 +30,8 @@ module.exports = function(params){
             "web":{type: String}
         },
         "zone":{ type: params.mongoose.Schema.Types.ObjectId, ref:'zone'},
-        "category":{ type: params.mongoose.Schema.Types.ObjectId, ref:'category'}
+        "category":{ type: params.mongoose.Schema.Types.ObjectId, ref:'category'},
+        "reserveExpireTime": { type: Number, default: 2 }
     });
 
     businessSchema.index({name: 1});

@@ -21,8 +21,10 @@ module.exports = function(params){
     var reserveSchema = new params.mongoose.Schema({
         "device": { type: params.mongoose.Schema.Types.ObjectId, ref:'device'},
         "promotion": { type: params.mongoose.Schema.Types.ObjectId, ref:'promotion'},
+        "business": { type: params.mongoose.Schema.Types.ObjectId, ref:'business'},
         "amount":{type: Number},
-        "date":{type: Date, default: new Date()}
+        "starts":{type: Date},
+        "ends": {type: Date}
     });
 
     return params.mongoose.model('reserve', reserveSchema, 'reserve');
