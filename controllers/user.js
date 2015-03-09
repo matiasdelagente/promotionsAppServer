@@ -13,6 +13,7 @@ module.exports = function(params){
             params.app.get('/user/:userId', getById);
             params.app.post('/user', add);
             params.app.put('/user/:userId', update);
+            params.app.delete('/user/:userId', deleteUser);
         }
 
         function get(req, res){
@@ -111,6 +112,36 @@ module.exports = function(params){
 
             params.Ya.user_model.findById(userId).exec(updateUserCb);
         }
+
+        function deleteUser(req,res){
+
+            var response = {
+                code:500,
+                result:{}
+            };
+
+            var userId = req.params.userId;
+            if(!userId){
+                res.json(response);
+                return;
+            }
+
+            var deleteUserCb = function(err,userDoc){
+                if(err){
+                    if(params.debug)console.log('Error mongodb delete user', err);
+                    response.code = 506;
+                    res.json(response);
+                    return;
+                }
+                response.code = 200;
+                response.result = userDoc;
+                res.json(response);
+
+            };
+
+            params.Ya.user_model.findByIdAndRemove(userId).exec(deleteUserCb);
+        }
+
 
         function add(req, res){
 
