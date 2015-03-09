@@ -21,12 +21,15 @@ module.exports = function(params){
          * @method init
          */
         function init(){
+            params.app.get('/businesses',get);
             params.app.get('/businesses/:zone',get);
             params.app.get('/businesses/:zone/:skip/:limit',get);
             params.app.get('/businesses/:zone/:skip/:limit/:category',get);
             params.app.get('/businesses/:zone/:skip/:limit/:category/:name',get);
             params.app.get('/business/:businessId',getById);
             params.app.post('/business',add);
+            params.app.delete('/business/:businessId', deleteBusiness);
+            
         }
 
 
@@ -118,6 +121,35 @@ module.exports = function(params){
          * @param req
          * @param res
          */
+         function deleteBusiness(req,res){
+
+             var response = {
+                 code:500,
+                 result:{}
+             };
+
+             var businessId = req.params.businessId;
+             if(!businessId){
+                 res.json(response);
+                 return;
+             }
+
+             var deleteBusinessCb = function(err,businessDoc){
+                 if(err){
+                     if(params.debug)console.log('Error mongodb delete business', err);
+                     response.code = 506;
+                     res.json(response);
+                     return;
+                 }
+                 response.code = 200;
+                 response.result = businessDoc;
+                 res.json(response);
+
+             };
+
+             params.Ya.business_model.findByIdAndRemove(businessId).exec(deleteBusinessCb);
+         }
+
         function add(req,res){
 
             var response = {
