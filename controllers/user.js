@@ -158,7 +158,6 @@ module.exports = function(params){
                 "business": req.body.business
             };
 
-            console.log(user)
             params.Ya.user_model.create(user, function(err,doc){
                 if(err){
                     if(params.debug) console.log('Error mongodb adding user',err);
