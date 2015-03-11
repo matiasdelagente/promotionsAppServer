@@ -10,7 +10,7 @@ module.exports = function(params){
     var userSchema = params.mongoose.Schema ({
         "name": {type: String},
         "password": {type: String},
-        "bussiness": {type: params.mongoose.Schema.Types.ObjectId, ref: 'business'}
+        "business": {type: params.mongoose.Schema.Types.ObjectId, ref: 'business'}
     });
 
     userSchema.index({name: 1});

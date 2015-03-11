@@ -71,7 +71,7 @@ module.exports = function(params){
                 code:500,
                 result:{}
             };
-
+            console.log(req.params)
             var zoneId = req.params.zoneId;
             if(!zoneId){
                 res.json(response);

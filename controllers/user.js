@@ -85,7 +85,8 @@ module.exports = function(params){
             }
 
             var name = req.body.name;
-            var password = req.body.password
+            var password = req.body.password;
+            var business = req.body.business;
 
             var updateUserCb = function(err,userDoc){
                 if(err){
@@ -96,6 +97,7 @@ module.exports = function(params){
                 }
                 if(name)userDoc.name = name;
                 if(password)userDoc.password = password;
+                if(business)userDoc.business = business;
 
                 userDoc.save(function (err, updatedUser) {
                     if(err){
@@ -152,9 +154,11 @@ module.exports = function(params){
 
             var user = {
                 "name": req.body.name,
-                "password": req.body.password
+                "password": req.body.password,
+                "business": req.body.business
             };
 
+            console.log(user)
             params.Ya.user_model.create(user, function(err,doc){
                 if(err){
                     if(params.debug) console.log('Error mongodb adding user',err);

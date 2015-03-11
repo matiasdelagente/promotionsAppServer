@@ -1,11 +1,3 @@
-/**
- * Controller for categories
- *
- * @module _Ya
- * @submodule doctor
- * @author Claudio A. Marrero
- * @class _Ya.Promotion
- */
 'use strict';
 module.exports = function(params){
 
@@ -21,10 +13,12 @@ module.exports = function(params){
          * @method init
          */
         function init(){
+            params.app.get('/promotions',get);
             params.app.get('/promotions/:zone',get);
             params.app.get('/promotions/:zone/:skip/:limit/:businessId',get);
             params.app.get('/promotion/:promotionId',getById);
             params.app.post('/promotion',add);
+            params.app.delete('/promotion/:promotionId', deletePromotion);
         }
 
         /**
@@ -102,6 +96,35 @@ module.exports = function(params){
             };
 
             params.Ya.promotion_model.findById(promotionId).populate('business category zone').exec(promotionCb);
+        }
+
+        function deletePromotion(req,res){
+
+            var response = {
+                code:500,
+                result:{}
+            };
+
+            var promotionId = req.params.promotionId;
+            if(!promotionId){
+                res.json(response);
+                return;
+            }
+
+            var deletePromotionCb = function(err,promotionDoc){
+                if(err){
+                    if(params.debug)console.log('Error mongodb delete promotion', err);
+                    response.code = 506;
+                    res.json(response);
+                    return;
+                }
+                response.code = 200;
+                response.result = promotionDoc;
+                res.json(response);
+
+            };
+
+            params.Ya.promotion_model.findByIdAndRemove(promotionId).exec(deletePromotionCb);
         }
 
         /**

@@ -107,10 +107,10 @@ var Ya = (function(){
         res.setHeader('Access-Control-Allow-Credentials', true);
         next();
     });
-	_app.listen(80);
+	_app.listen(8888);
 
 	/**
-	* This method make the initialization of all coinding server, 
+	* This method make the initialization of all coinding server,
 	* Makes a load of all modules and shot the connection to mongodb
 	*
 	* @method init
@@ -137,7 +137,7 @@ var Ya = (function(){
 	}
 
 	/**
-	* Make a conexion to the database, 
+	* Make a conexion to the database,
 	*
 	* @method connect
 	* @example connect();
@@ -155,7 +155,7 @@ var Ya = (function(){
 	return {
 		init:init
 	};
-	
+
 })();
 
 Ya.init();
