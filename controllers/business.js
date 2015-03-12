@@ -29,7 +29,7 @@ module.exports = function(params){
             params.app.get('/business/:businessId',getById);
             params.app.post('/business',add);
             params.app.delete('/business/:businessId', deleteBusiness);
-            
+            params.app.put('/business/:businessId', deleteBusiness);
         }
 
 
@@ -174,7 +174,7 @@ module.exports = function(params){
                 "zone":req.body.zone,
                 "category":req.body.category
             };
-
+            console.log(business)
             params.Ya.business_model.create(business,function(err,doc){
                 if(err){
                     if(params.debug)console.log('Error mongodb adding business', err);
