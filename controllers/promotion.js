@@ -18,7 +18,7 @@ module.exports = function(params){
             params.app.get('/promotions/:zone/:skip/:limit/:businessId',get);
             params.app.get('/promotion/:promotionId',getById);
             params.app.post('/promotion',add);
-            params.app.put('/promotion/:promotionId', deletePromotion);
+            params.app.put('/promotion/:promotionId', update);
             params.app.delete('/promotion/:promotionId', deletePromotion);
         }
 
@@ -127,6 +127,58 @@ module.exports = function(params){
 
             params.Ya.promotion_model.findByIdAndRemove(promotionId).exec(deletePromotionCb);
         }
+
+        function update(req,res){
+
+            var response = {
+                code:500,
+                result:{}
+            };
+
+            var promotionId = req.params.promotionId;
+            if(!promotionId){
+                res.json(response);
+                return;
+            }
+
+            var name = req.body.name;
+            var description = req.body.description;
+            var bgimg = req.body.bgimg;
+            var business = req.body.business;
+            var category = req.body.category;
+            var zone = req.body.zone;
+
+            var updatePromotionCb = function(err,promotionDoc){
+                if(err){
+                    if(params.debug)console.log('Error mongodb update promotion', err);
+                    response.code = 506;
+                    res.json(response);
+                    return;
+                }
+                if(name)promotionDoc.name = name;
+                if(description)promotionDoc.description = description;
+                if(bgimg)promotionDoc.bgimg = bgimg;
+                if(business)promotionDoc.business = business;
+                if(category)promotionDoc.category = category;
+                if(zone)promotionDoc.zone = zone;
+
+                promotionDoc.save(function (err, updatedPromotion) {
+                    if(err){
+                        if(params.debug)console.log('Error mongodb update promotion', err);
+                        response.code = 506;
+                        res.json(response);
+                        return;
+                    }
+                    response.code = 200;
+                    response.result = updatedPromotion;
+                    console.log(response.result)
+                    res.json(response);
+                });
+            };
+
+            params.Ya.promotion_model.findById(promotionId).exec(updatePromotionCb);
+        }
+
 
         /**
          * Create new promotion
