@@ -29,7 +29,7 @@ module.exports = function(params){
             params.app.get('/business/:businessId',getById);
             params.app.post('/business',add);
             params.app.delete('/business/:businessId', deleteBusiness);
-            params.app.put('/business/:businessId', deleteBusiness);
+            params.app.put('/business/:businessId', update);
         }
 
 
@@ -121,6 +121,66 @@ module.exports = function(params){
          * @param req
          * @param res
          */
+
+         function update(req,res){
+
+             var response = {
+                 code:500,
+                 result:{}
+             };
+
+             var businessId = req.params.businessId;
+             if(!businessId){
+                 res.json(response);
+                 return;
+             }
+
+             var name = req.body.name
+             var dispo = req.body.dispo
+             var bgimg = req.body.bgimg
+             var address = req.body.address
+             var phone = req.body.phone
+             var facebook = req.body.facebook
+             var web = req.body.web
+             var zone = req.body.zone
+             var category = req.body.category
+
+             var updateUserCb = function(err,businessDoc){
+                 if(err){
+                     if(params.debug)console.log('Error mongodb update business', err);
+                     response.code = 506;
+                     res.json(response);
+                     return;
+                 }
+
+                 if(name)businessDoc.name = name;
+                 if(dispo)businessDoc.dispo = dispo;
+                 if(bgimg)businessDoc.bgimg = bgimg;
+                 if(address)businessDoc.contact.address = address
+                 if(phone)businessDoc.contact.phone = phone
+                 if(facebook)businessDoc.contact.facebook = facebook
+                 if(web)businessDoc.contact.web = web
+                 if(zone)businessDoc.zone = zone
+                 if(category)businessDoc.category = category
+
+                 businessDoc.save(function (err, updatedUser) {
+                     if(err){
+                         if(params.debug)console.log('Error mongodb update business', err);
+                         response.code = 506;
+                         res.json(response);
+                         return;
+                     }
+                     response.code = 200;
+                     response.result = updatedUser;
+                     console.log(response.result)
+                     res.json(response);
+                 });
+             };
+
+             params.Ya.business_model.findById(businessId).exec(updateUserCb);
+         }
+
+
          function deleteBusiness(req,res){
 
              var response = {
