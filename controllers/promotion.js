@@ -18,6 +18,7 @@ module.exports = function(params){
             params.app.get('/promotions/:zone/:skip/:limit/:businessId',get);
             params.app.get('/promotion/:promotionId',getById);
             params.app.post('/promotion',add);
+            params.app.put('/promotion/:promotionId', deletePromotion);
             params.app.delete('/promotion/:promotionId', deletePromotion);
         }
 
