@@ -26,10 +26,9 @@ module.exports = function(params){
             params.app.get('/devices/:skip/:limit',get);
             params.app.get('/device/:deviceId',getById);
             params.app.post('/device',add);
-            params.app.put('/device/:deviceId/notifications/id', updateNotificationsId);
-            params.app.put('/device/:deviceId/notifications/enabled', enableDisableNotifications);
-            params.app.get('/device/:deviceId/notifications/enabled', areNotificationsEnabled);
-            params.app.post('/device/:deviceId/notifications', sendNotification);
+            params.app.post('/device/:deviceId/notifications/id', updateNotificationsId);
+            params.app.post('/device/:deviceId/notifications/enabled', enableDisableNotifications);
+            params.app.post('/device/notifications', sendNotification);
             params.app.put('/device/:deviceId/email', updateEmail);
         }
 
@@ -115,7 +114,6 @@ module.exports = function(params){
 
             var deviceObj =
             {
-                "fingerprint": req.body.fingerprint,
                 "device": req.body.device,
                 "email": req.body.email
             };
@@ -147,13 +145,13 @@ module.exports = function(params){
             };
 
             var deviceId = req.params.deviceId;
+            console.log(deviceId);
             if(!deviceId){
                 res.json(response);
                 return;
             }
 
             var notificationId = req.body.id;
-
             var updateNotificationsIdCb = function(err,deviceDoc){
                 if(err){
                     if(params.debug)console.log('Error mongodb update notifications id', err);
@@ -171,40 +169,6 @@ module.exports = function(params){
                     'notifications.id': notificationId
                 }
             }).exec(updateNotificationsIdCb);
-        }
-
-        /**
-         * Returns whether notifications are enabled or not
-         * @method areNotificationsEnabled
-         * @param req
-         * @param res
-         */
-        function areNotificationsEnabled(req,res){
-
-            var response = {
-                code:500,
-                result:{}
-            };
-
-            var deviceId = req.params.deviceId;
-            if(!deviceId){
-                res.json(response);
-                return;
-            }
-
-            var cb = function(err,deviceDoc){
-                if(err){
-                    if(params.debug)console.log('Error mongodb are notifications enabled', err);
-                    response.code = 506;
-                    res.json(response);
-                    return;
-                }
-                response.code = 200;
-                response.result = deviceDoc.notifications.enabled;
-                res.json(response);
-            };
-
-            params.Ya.device_model.findById(deviceId).exec(cb);
         }
 
         /**
@@ -261,51 +225,48 @@ module.exports = function(params){
                 result:{}
             };
 
-            var deviceId = req.params.deviceId;
-            if(!deviceId){
-                res.json(response);
-                return;
-            }
-            var notification = {
+            var notData = {
                 title: req.body.title,
                 message: req.body.message
             };
+
             var message = new gcm.Message({
                 collapseKey: 'demo',
                 delayWhileIdle: true,
                 timeToLive: 3000,
-                data: notification
+                data: notData
             });
-            var APIKey = params.Ya.gcm.APIKey;
-            var sender = new gcm.Sender(APIKey);
+
+            var sender = new gcm.Sender(params.Ya.gcm.APIKey);
 
             var deviceCb = function(err,deviceDoc){
-                if(err){
+                if(err || !deviceDoc){
                     if(params.debug)console.log('Error mongodb send notification', err);
                     response.code = 506;
                     res.json(response);
                     return;
                 }
-                if (deviceDoc.notifications.enabled) {
-                    sender.sendNoRetry(message, deviceDoc.notifications.id, function (err, result) {
-                        if (err) {
-                            if(params.debug)console.log('Error mongodb send notification', err);
-                            response.code = 500;
-                            res.json(response);
-                            return;
-                        }
-                        response.code = 200;
-                        response.result = result;
+                var notifications = [];
+                deviceDoc.forEach(function(item){
+                    if(!item.notifications.id){
+                        return;
+                    }
+                    notifications.push(item.notifications.id)
+                });
+                sender.sendNoRetry(message, notifications, function (err, result) {
+                    if (err) {
+                        if(params.debug)console.log('Error gmc send notification', err);
+                        response.code = 500;
                         res.json(response);
-                    });
-                } else {
+                        return;
+                    }
                     response.code = 200;
-                    response.result = 'Notificaciones desactivadas para el dispositivo ' + deviceId;
+                    response.result = {};
                     res.json(response);
-                }
+                });
             };
 
-            params.Ya.device_model.findById(deviceId).exec(deviceCb);
+            params.Ya.device_model.find({'notifications.enabled':true}).exec(deviceCb);
         }
 
 

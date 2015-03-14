@@ -34,7 +34,7 @@ module.exports = function(params){
 			server: { poolSize: 3 },
 			replset: { rs_name: 'ya', strategy: 'ping'},
 			user:'ya',
-			pass: 'ya2014$'
+			pass: 'ya2015$'
 		};
 
 		options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
