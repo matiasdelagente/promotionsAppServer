@@ -100,6 +100,7 @@ var Ya = (function(){
 	_app.set('views', __dirname + '/tpl');
 	_app.use(_bodyParser.urlencoded({ extended: false }));
 	_app.use(_bodyParser.json());
+    _app.use('/uploads',_express.static('./uploads'));
     _app.use(function(req, res, next) {
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
