@@ -25,6 +25,7 @@ module.exports = function(params){
          */
         function init(){
             params.app.get('/reserves/:device',get);
+            params.app.get('/reserves',get);
             params.app.get('/reserves/:device/:skip/:limit',get);
             params.app.get('/reserve/:reserveId',getById);
             params.app.post('/reserve',add);
@@ -49,6 +50,9 @@ module.exports = function(params){
 
             if(req.params.device){
                 query.device = req.params.device;
+            }
+            if(req.params.business){
+                query.device = req.params.business;
             }
 
             var skip = (req.params.skip)?req.params.skip:0;
