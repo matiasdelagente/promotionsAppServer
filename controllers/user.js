@@ -38,7 +38,7 @@ module.exports = function(params){
             if(!req.body.email){res.json(response); return;}
             if(!req.body.password){res.json(response); return;}
             var userCb = function(err,userDoc){
-                if(err || userDoc)res.json(response);
+                if(err || userDoc){res.json(response); return;}
                 var regCb = function(e,d){
                     if(err || !d){res.json(response);return;}
                     params.Ya.auth.setToken(d._id,req.body.email,req.body.password);
@@ -65,8 +65,8 @@ module.exports = function(params){
                 result: {}
             };
             //TODO: Decrypt password
-            if(!req.body.email)res.json(response);
-            if(!req.body.password)res.json(response);
+            if(!req.body.email){res.json(response); return;}
+            if(!req.body.password){res.json(response); return;}
             var userCb = function(err,userDoc){
                 if(err || !userDoc){res.json(response); return;}
                 params.Ya.auth.setToken(userDoc._id,req.body.email,req.body.password);
