@@ -148,8 +148,6 @@ module.exports = function(params){
 
                 params.Ya.user_model.find(query).populate('business').exec(userCb);
 
-            }
-
         }
 
         /**
@@ -205,15 +203,11 @@ module.exports = function(params){
                 res.json(response);
                 return;
             }
-
-<<<<<<< HEAD
             var name = req.body.name;
             var password = req.body.password;
             var business = req.body.business;
             var business = req.body.email;
 
-=======
->>>>>>> c59f4c68b65cbf8fe72990abb6f5e186efcc9eb8
             var updateUserCb = function(err,userDoc){
                 if(err){
                     if(params.debug)console.log('Error mongodb update user', err);

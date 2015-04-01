@@ -138,10 +138,10 @@ module.exports = function(params){
              var name = req.body.name
              var dispo = req.body.dispo
              var bgimg = req.body.bgimg
-             var address = req.body.address
-             var phone = req.body.phone
-             var facebook = req.body.facebook
-             var web = req.body.web
+             var address = req.body.contact.address
+             var phone = req.body.contact.phone
+             var facebook = req.body.contact.facebook
+             var web = req.body.contact.web
              var zone = req.body.zone
              var category = req.body.category
 
