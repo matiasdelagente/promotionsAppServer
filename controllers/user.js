@@ -206,7 +206,7 @@ module.exports = function(params){
             var name = req.body.name;
             var password = req.body.password;
             var business = req.body.business;
-            var business = req.body.email;
+            var email = req.body.email;
 
             var updateUserCb = function(err,userDoc){
                 if(err){
@@ -275,7 +275,8 @@ module.exports = function(params){
             var user = {
                 "name": req.body.name,
                 "password": req.body.password,
-                "business": req.body.business
+                "business": req.body.business,
+                "email" : req.body.email;
             };
 
             params.Ya.user_model.create(user, function(err,doc){
