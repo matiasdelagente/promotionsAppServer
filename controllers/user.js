@@ -8,7 +8,14 @@ module.exports = function(params){
 
     var User = (function(){
 
+        /**
+         * Initialization enddpints
+         */
         function init(){
+            params.app.post('/login',login);
+            params.app.post('/register',register);
+            params.app.post('/logout',logout);
+            params.app.post('/autologin',autoLogin);
             params.app.get('/user', get);
             params.app.get('/user/:userId', getById);
             params.app.post('/user', add);
@@ -16,6 +23,108 @@ module.exports = function(params){
             params.app.delete('/user/:userId', deleteUser);
         }
 
+        /**
+         * Register users
+         * @method login
+         * @param req
+         * @param res
+         */
+        function register(req,res){
+            var response = {
+                code: 400,
+                result: {}
+            };
+            //TODO: Decrypt password
+            if(!req.body.email){res.json(response); return;}
+            if(!req.body.password){res.json(response); return;}
+            var userCb = function(err,userDoc){
+                if(err || userDoc)res.json(response);
+                var regCb = function(e,d){
+                    if(err || !d){res.json(response);return;}
+                    params.Ya.auth.setToken(d._id,req.body.email,req.body.password);
+                    response.code = 200;
+                    response.result.user = d;
+                    response.result.token = params.Ya.auth.getToken(req.body.email,req.body.password);
+                    res.json(response);
+                };
+                var newUser = {email:req.body.email,password:req.body.password,role:'business',isAdmin:false};
+                params.Ya.user_model.create(newUser,regCb);
+            };
+            params.Ya.user_model.findOne({email:req.body.email},userCb);
+        }
+
+        /**
+         * Login users
+         * @method login
+         * @param req
+         * @param res
+         */
+        function login(req,res){
+            var response = {
+                code: 400,
+                result: {}
+            };
+            //TODO: Decrypt password
+            if(!req.body.email)res.json(response);
+            if(!req.body.password)res.json(response);
+            var userCb = function(err,userDoc){
+                if(err || !userDoc){res.json(response); return;}
+                params.Ya.auth.setToken(userDoc._id,req.body.email,req.body.password);
+                response.code = 200;
+                response.result.user = userDoc;
+                response.result.token = params.Ya.auth.getToken(req.body.email,req.body.password);
+                res.json(response);
+            };
+            params.Ya.user_model.findOne({email:req.body.email,password:req.body.password},userCb);
+        }
+
+        /**
+         * Make login with token
+         * @method autoLogin
+         * @param req
+         * @param res
+         */
+        function autoLogin(req,res){
+            var response = {
+                code: 400,
+                result: {}
+            };
+            if(!req.body.token || !params.Ya.auth.validateSession(req.body.token)){res.json(response); return;}
+            var userId = params.Ya.auth.getUserByToken(req.body.token);
+            var userCb = function(err,userDoc){
+                if(err || !userDoc){res.json(response); return;}
+                params.Ya.auth.setToken(userDoc._id,req.body.email,req.body.password);
+                response.code = 200;
+                response.result.user = userDoc;
+                response.result.token = params.Ya.auth.getToken(req.body.email,req.body.password);
+                res.json(response);
+            };
+            params.Ya.user_model.findById(userId,userCb);
+        }
+
+        /**
+         * Clear token and logout user
+         * @method logout
+         * @param req
+         * @param res
+         */
+        function logout(req,res){
+            var response = {
+                code: 400,
+                result: {}
+            };
+            if(!req.body.token || !params.Ya.auth.validateSession(req.body.token)){res.json(response);return;}
+            params.Ya.auth.deleteToken(req.body.token);
+            response.code = 200;
+            res.json(response);
+        }
+
+        /**
+         * Get all users
+         * @method get
+         * @param req
+         * @param res
+         */
         function get(req, res){
 
             var response = {
@@ -37,11 +146,16 @@ module.exports = function(params){
                 res.json(response);
             };
 
-                params.Ya.user_model.find(query).exec(userCb);
+            params.Ya.user_model.find(query).exec(userCb);
 
-            }
+        }
 
-
+        /**
+         * Get users by ID
+         * @method getById
+         * @param req
+         * @param res
+         */
         function getById(req, res){
 
             var response = {
@@ -51,7 +165,7 @@ module.exports = function(params){
 
             var userId = req.params.userId;
             if(!userId){
-                res.json(response)
+                res.json(response);
                 return;
             }
 
@@ -62,7 +176,7 @@ module.exports = function(params){
                     res.json(response);
                     return;
                 }
-                response.code = 200
+                response.code = 200;
                 response.result = userDoc;
                 res.json(response);
             };
@@ -71,6 +185,12 @@ module.exports = function(params){
 
         }
 
+        /**
+         * Update user
+         * @method update
+         * @param req
+         * @param res
+         */
         function update(req,res){
 
             var response = {
@@ -84,10 +204,6 @@ module.exports = function(params){
                 return;
             }
 
-            var name = req.body.name;
-            var password = req.body.password;
-            var business = req.body.business;
-
             var updateUserCb = function(err,userDoc){
                 if(err){
                     if(params.debug)console.log('Error mongodb update user', err);
@@ -95,26 +211,20 @@ module.exports = function(params){
                     res.json(response);
                     return;
                 }
-                if(name)userDoc.name = name;
-                if(password)userDoc.password = password;
-                if(business)userDoc.business = business;
-
-                userDoc.save(function (err, updatedUser) {
-                    if(err){
-                        if(params.debug)console.log('Error mongodb update user', err);
-                        response.code = 506;
-                        res.json(response);
-                        return;
-                    }
-                    response.code = 200;
-                    response.result = updatedUser;
-                    res.json(response);
-                });
+                response.code = 200;
+                response.result = userDoc;
+                res.json(response);
             };
 
-            params.Ya.user_model.findById(userId).exec(updateUserCb);
+            params.Ya.user_model.findByIdAndUpdate(userId,{$set:req.body}).exec(updateUserCb);
         }
 
+        /**
+         * Delete user from db
+         * @method deleteUser
+         * @param req
+         * @param res
+         */
         function deleteUser(req,res){
 
             var response = {
@@ -140,11 +250,16 @@ module.exports = function(params){
                 res.json(response);
 
             };
-
+            //TODO: Revisar que pasa con las relaciones si se elimina el usuario
             params.Ya.user_model.findByIdAndRemove(userId).exec(deleteUserCb);
         }
 
-
+        /**
+         * Add new users
+         * @method add
+         * @param req
+         * @param res
+         */
         function add(req, res){
 
             var response = {
@@ -152,6 +267,7 @@ module.exports = function(params){
                 result: {}
             };
 
+            //TODO: Encrypt the password
             var user = {
                 "name": req.body.name,
                 "password": req.body.password,

@@ -22,7 +22,7 @@ module.exports = function(params){
 		* @type {String}
 		* @private
 		*/
-		var _database = 'ya';
+		var _database = 'yapp';
 
 		/**
 		* Options to connect to mongodb
@@ -32,9 +32,9 @@ module.exports = function(params){
 		var options = {
 			db: {  safe: true, strict: false, native_parser:true },
 			server: { poolSize: 3 },
-			replset: { rs_name: 'ya', strategy: 'ping'},
-			user:'ya',
-			pass: 'ya2015$'
+			replset: { rs_name: 'yapp', strategy: 'ping'},
+			user:'yapp',
+			pass: 'yapp2015$'
 		};
 
 		options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
