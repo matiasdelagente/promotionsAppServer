@@ -12,6 +12,7 @@ module.exports = function(params){
 	return [
 		'./config/',
 		'./models/',
+		'./libs/',
 		'./controllers/'
 	];
 
