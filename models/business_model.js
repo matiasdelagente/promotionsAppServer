@@ -25,7 +25,7 @@ module.exports = function(params){
         "bgimg":{type: String},
         "contact":{
             "address":{type: String},
-            "phone":{type: String},
+            "phone":{type: Number},
             "facebook":{type: String},
             "web":{type: String}
         },

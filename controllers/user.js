@@ -37,7 +37,7 @@ module.exports = function(params){
                 res.json(response);
             };
 
-                params.Ya.user_model.find(query).exec(userCb);
+                params.Ya.user_model.find(query).populate('business').exec(userCb);
 
             }
 
@@ -87,6 +87,7 @@ module.exports = function(params){
             var name = req.body.name;
             var password = req.body.password;
             var business = req.body.business;
+            var business = req.body.email;
 
             var updateUserCb = function(err,userDoc){
                 if(err){

@@ -226,10 +226,10 @@ module.exports = function(params){
                 "dispo":req.body.dispo,
                 "bgimg":req.body.bgimg,
                 "contact":{
-                    "address":req.body.address,
-                    "phone":req.body.phone,
-                    "facebook":req.body.facebook,
-                    "web":req.body.web
+                    "address":req.body.contact.address,
+                    "phone":req.body.contact.phone,
+                    "facebook":req.body.contact.facebook,
+                    "web":req.body.contact.web
                 },
                 "zone":req.body.zone,
                 "category":req.body.category
