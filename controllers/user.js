@@ -276,7 +276,7 @@ module.exports = function(params){
                 "name": req.body.name,
                 "password": req.body.password,
                 "business": req.body.business,
-                "email" : req.body.email;
+                "email" : req.body.email
             };
 
             params.Ya.user_model.create(user, function(err,doc){
