@@ -1,7 +1,7 @@
 /**
 * Database Configurations, replicaset, user, password, name of database, servers etc.
 * You will need change this fail in every environment that you want to install this server.
-* 
+*
 * @module _Ya
 * @submodule database
 * @author Claudio A. Marrero
@@ -22,7 +22,7 @@ module.exports = function(params){
 		* @type {String}
 		* @private
 		*/
-		var _database = 'yapp';
+		var _database = 'ya';
 
 		/**
 		* Options to connect to mongodb
@@ -33,8 +33,8 @@ module.exports = function(params){
 			db: {  safe: true, strict: false, native_parser:true },
 			server: { poolSize: 3 },
 			replset: { rs_name: 'yapp', strategy: 'ping'},
-			user:'yapp',
-			pass: 'yapp2015$'
+			user:'ya',
+			pass: 'ya2014$'
 		};
 
 		options.server.socketOptions = options.replset.socketOptions = { keepAlive: 1 };
@@ -80,6 +80,6 @@ module.exports = function(params){
 			servers:servers
 		};
 	})();
-	
+
 	return Config;
 };

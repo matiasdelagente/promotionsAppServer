@@ -146,7 +146,7 @@ module.exports = function(params){
                 res.json(response);
             };
 
-                params.Ya.user_model.find(query).populate('business').exec(userCb);
+                params.Ya.user_model.find(query).populate('business').where('role').equals('business').exec(userCb);
 
         }
 

@@ -11,7 +11,7 @@ module.exports = function(params){
         "name": {type: String},
         "email": {type: String, unique: true, required: true, validate: [params.validate.email, 'invalid email address']},
         "password": {type: String},
-        "role":{ type: String, enum: ['admin','business']},
+        "role":{ type: String, enum: ['admin','business'], default: 'business'},
         "isAdmin":{ type: Boolean, default: false},
         "business": {type: params.mongoose.Schema.Types.ObjectId, ref: 'business'}
     });
