@@ -19,14 +19,16 @@ module.exports = function(params){
      * @private
      */
     var promotionSchema = new params.mongoose.Schema({
+        "code": {type: String},
         "name": {type: String},
-        "description": {type: String},
         "bgimg":{type: String},
+        "type":{type: String},
+        "description": {type: String},
+        "status": {type: String},
+        "expire": { type: Date},
         "business":{ type: params.mongoose.Schema.Types.ObjectId, ref:'business'},
         "category":{ type: params.mongoose.Schema.Types.ObjectId, ref:'category'},
         "zone":{ type: params.mongoose.Schema.Types.ObjectId, ref:'zone'},
-        "time": { type: Date},
-        "expire": { type: Date},
         "amount": { type: Number},
         "takenUsers": { type: Number}
     });

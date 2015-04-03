@@ -196,13 +196,19 @@ module.exports = function(params){
             //TODO: Upload image
             var promotionObj =
             {
+                "code": req.body.code,
                 "name": req.body.name,
-                "description": req.body.description,
                 "bgimg": req.body.bgimg,
+                "type": req.body.type,
+                "description": req.body.description,
+                "status": req.body.status,
+                "expire": req.body.expire,
                 "business": req.body.business,
                 "category": req.body.category,
                 "zone": req.body.zone
             };
+
+            console.log(promotionObj);
 
             params.Ya.promotion_model.create(promotionObj,function(err,doc){
                 if(err){
