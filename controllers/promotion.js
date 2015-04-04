@@ -141,12 +141,18 @@ module.exports = function(params){
                 return;
             }
 
+            var code = req.body.code;
             var name = req.body.name;
-            var description = req.body.description;
             var bgimg = req.body.bgimg;
+            var type = req.body.type;
+            var description = req.body.description;
+            var status = req.body.status;
+            var expire = req.body.expire;
             var business = req.body.business;
             var category = req.body.category;
             var zone = req.body.zone;
+
+            console.log(req.body);
 
             var updatePromotionCb = function(err,promotionDoc){
                 if(err){
@@ -155,9 +161,13 @@ module.exports = function(params){
                     res.json(response);
                     return;
                 }
+                if(code)promotionDoc.code = code;
                 if(name)promotionDoc.name = name;
-                if(description)promotionDoc.description = description;
                 if(bgimg)promotionDoc.bgimg = bgimg;
+                if(type)promotionDoc.type = type;
+                if(description)promotionDoc.description = description;
+                if(status)promotionDoc.status = status;
+                if(expire)promotionDoc.expire = expire;
                 if(business)promotionDoc.business = business;
                 if(category)promotionDoc.category = category;
                 if(zone)promotionDoc.zone = zone;
@@ -171,7 +181,6 @@ module.exports = function(params){
                     }
                     response.code = 200;
                     response.result = updatedPromotion;
-                    console.log(response.result)
                     res.json(response);
                 });
             };
@@ -207,8 +216,6 @@ module.exports = function(params){
                 "category": req.body.category,
                 "zone": req.body.zone
             };
-
-            console.log(promotionObj);
 
             params.Ya.promotion_model.create(promotionObj,function(err,doc){
                 if(err){
