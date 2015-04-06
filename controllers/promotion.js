@@ -46,6 +46,10 @@ module.exports = function(params){
                 query.business = req.params.businessId;
             }
 
+            if(req.query.businessId){
+                query.business = req.query.businessId;
+            }
+            
             var skip = (req.params.skip)?req.params.skip:0;
             var limit = (req.params.limit)?req.params.limit:20;
 
@@ -151,8 +155,6 @@ module.exports = function(params){
             var business = req.body.business;
             var category = req.body.category;
             var zone = req.body.zone;
-
-            console.log(req.body);
 
             var updatePromotionCb = function(err,promotionDoc){
                 if(err){
