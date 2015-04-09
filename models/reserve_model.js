@@ -24,7 +24,11 @@ module.exports = function(params){
         "business": { type: params.mongoose.Schema.Types.ObjectId, ref:'business'},
         "amount":{type: Number},
         "starts":{type: Date},
-        "ends": {type: Date}
+        "ends": {type: Date},
+        "status": {
+            "_id":{type: String},
+            "name":{type: String}
+        },
     });
 
     return params.mongoose.model('reserve', reserveSchema, 'reserve');

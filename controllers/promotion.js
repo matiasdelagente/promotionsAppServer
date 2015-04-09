@@ -8,6 +8,14 @@ module.exports = function(params){
     var Promotion = (function(){
 
         /**
+         * multiparty middleware
+         * @type {exports}
+         * @private
+         */
+        var _multipart = require('connect-multiparty');
+        var _multipartMiddleware = _multipart({uploadDir: './uploads/promotions'});
+
+        /**
          * Initialization method for Admin
          *
          * @method init
@@ -18,10 +26,24 @@ module.exports = function(params){
             params.app.get('/promotions/:zone/:skip/:limit/:businessId',get);
             params.app.get('/promotion/:promotionId',getById);
             params.app.post('/promotion',add);
+            params.app.post('/upload',_multipartMiddleware,upload);
             params.app.put('/promotion/:promotionId', update);
             params.app.delete('/promotion/:promotionId', deletePromotion);
         }
 
+        function upload(req, res){
+            var response = {
+                code:500,
+                result:{}
+            };
+            var file = req.files.file;
+            if(file){
+                console.log(req.files)
+                response.code = 200;
+                response.result = file.path;
+                res.json(response);
+            }
+        }
         /**
          * Get all promotion from db
          *
@@ -49,7 +71,7 @@ module.exports = function(params){
             if(req.query.businessId){
                 query.business = req.query.businessId;
             }
-            
+
             var skip = (req.params.skip)?req.params.skip:0;
             var limit = (req.params.limit)?req.params.limit:20;
 
@@ -147,7 +169,7 @@ module.exports = function(params){
 
             var code = req.body.code;
             var name = req.body.name;
-            var bgimg = req.body.bgimg;
+            var bgimg = req.body.image;
             var type = req.body.type;
             var description = req.body.description;
             var status = req.body.status;
@@ -209,7 +231,7 @@ module.exports = function(params){
             {
                 "code": req.body.code,
                 "name": req.body.name,
-                "bgimg": req.body.bgimg,
+                "bgimg": req.body.image,
                 "type": req.body.type,
                 "description": req.body.description,
                 "status": req.body.status,
@@ -231,6 +253,28 @@ module.exports = function(params){
                 res.json(response);
             });
         }
+        /*
+        function save(req,res){
+
+            var response = {
+                code: 400,
+                result: {}
+            };
+            console.log(req);
+            // TODO: Add object validation
+            if (!req.body) { res.json(response); }
+
+            var imageObj = {
+                file: req.files.myfile,
+                name: parsePathForName(req.files.file)
+            };
+
+            params.Ya.image_model.create(imageObj);
+        }
+
+        function parsePathForName(file){
+            return file.path.replace('uploads\\promotions\\','');
+        }*/
 
         return {
             init:init

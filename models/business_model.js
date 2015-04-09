@@ -21,7 +21,7 @@ module.exports = function(params){
     var businessSchema = new params.mongoose.Schema({
         "name": {type: String},
         "address": {type: String},
-        "dispo":{type: Number},
+        "dispo":{type: Number, default: 50},
         "bgimg":{type: String},
         "contact":{
             "address":{type: String},

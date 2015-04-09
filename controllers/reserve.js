@@ -30,6 +30,7 @@ module.exports = function(params){
             params.app.get('/reserve/:reserveId',getById);
             params.app.post('/reserve',add);
             params.app.post('/reserve/cancel',cancel);
+            params.app.put('/reserve/:reserveId', update);
         }
 
         /**
@@ -54,6 +55,9 @@ module.exports = function(params){
             if(req.params.business){
                 query.device = req.params.business;
             }
+            if(req.query.businessId){
+                query.business = req.query.businessId;
+            }
 
             var skip = (req.params.skip)?req.params.skip:0;
             var limit = (req.params.limit)?req.params.limit:20;
@@ -73,7 +77,7 @@ module.exports = function(params){
             params.Ya.reserve_model.find(query).populate('device promotion')
                 .skip(skip)
                 .limit(limit)
-                .where('ends').gt(moment())
+                //.where('ends').gt(moment())
                 .exec(reserveCb);
         }
 
@@ -204,6 +208,46 @@ module.exports = function(params){
                 response.result = reserveDoc;
                 res.json(response);
             });
+        }
+
+        function update(req,res){
+
+            var response = {
+                code:500,
+                result:{}
+            };
+
+            var reserveId = req.params.reserveId;
+            if(!reserveId){
+                res.json(response);
+                return;
+            }
+
+            var status = req.body.status;
+            
+            var updateReserveCb = function(err,reserveDoc){
+                if(err){
+                    if(params.debug)console.log('Error mongodb update reserve', err);
+                    response.code = 506;
+                    res.json(response);
+                    return;
+                }
+                if(status)reserveDoc.status = status;
+
+                reserveDoc.save(function (err, updatedReserve) {
+                    if(err){
+                        if(params.debug)console.log('Error mongodb update reserve', err);
+                        response.code = 506;
+                        res.json(response);
+                        return;
+                    }
+                    response.code = 200;
+                    response.result = updatedReserve;
+                    res.json(response);
+                });
+            };
+
+            params.Ya.reserve_model.findById(reserveId).exec(updateReserveCb);
         }
 
         return {

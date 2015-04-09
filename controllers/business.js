@@ -16,6 +16,14 @@ module.exports = function(params){
     var Business = (function(){
 
         /**
+         * multiparty middleware
+         * @type {exports}
+         * @private
+         */
+        var _multipart = require('connect-multiparty');
+        var _multipartMiddleware = _multipart({uploadDir: './uploads/business'});
+
+        /**
          * Initialization method for Admin
          *
          * @method init
@@ -28,10 +36,24 @@ module.exports = function(params){
             params.app.get('/businesses/:zone/:skip/:limit/:category/:name',get);
             params.app.get('/business/:businessId',getById);
             params.app.post('/business',add);
+            params.app.post('/upload',_multipartMiddleware,upload);
             params.app.delete('/business/:businessId', deleteBusiness);
             params.app.put('/business/:businessId', update);
         }
 
+        function upload(req, res){
+            var response = {
+                code:500,
+                result:{}
+            };
+            var file = req.files.file;
+            if(file){
+                console.log(req.files)
+                response.code = 200;
+                response.result = file.path;
+                res.json(response);
+            }
+        }
 
         /**
          * Get all business from db
@@ -134,16 +156,17 @@ module.exports = function(params){
                  res.json(response);
                  return;
              }
-
+             console.log(req.body);
              var name = req.body.name
-             var dispo = req.body.dispo
-             var bgimg = req.body.bgimg
+             if(req.body.dispo)var dispo = req.body.dispo
+             var bgimg = req.body.image
              var address = req.body.contact.address
              var phone = req.body.contact.phone
              var facebook = req.body.contact.facebook
              var web = req.body.contact.web
              var zone = req.body.zone
              var category = req.body.category
+             if(req.body.reserveExpireTime)var reserveExpireTime = req.body.reserveExpireTime
 
              var updateUserCb = function(err,businessDoc){
                  if(err){
@@ -162,6 +185,7 @@ module.exports = function(params){
                  if(web)businessDoc.contact.web = web
                  if(zone)businessDoc.zone = zone
                  if(category)businessDoc.category = category
+                 if(reserveExpireTime)businessDoc.reserveExpireTime = reserveExpireTime
 
                  businessDoc.save(function (err, updatedUser) {
                      if(err){
@@ -223,8 +247,7 @@ module.exports = function(params){
             {
                 "name": req.body.name,
                 "address": req.body.address,
-                "dispo":req.body.dispo,
-                "bgimg":req.body.bgimg,
+                "bgimg":req.body.image,
                 "contact":{
                     "address":req.body.contact.address,
                     "phone":req.body.contact.phone,
